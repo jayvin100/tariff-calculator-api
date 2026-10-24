@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
+using TariffCalculator.Api.Ai;
 using TariffCalculator.Api.Data;
 using TariffCalculator.Api.Endpoints;
 using TariffCalculator.Core;
@@ -12,6 +13,11 @@ builder.Services.AddSingleton<BillCalculator>();
 // DbContext is scoped: one per request
 builder.Services.AddDbContext<TariffDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
+
+// Claude: key from user-secrets / Anthropic__ApiKey, or the standard ANTHROPIC_API_KEY env var
+builder.Services.Configure<AnthropicOptions>(builder.Configuration.GetSection("Anthropic"));
+builder.Services.PostConfigure<AnthropicOptions>(o => o.ApiKey ??= Environment.GetEnvironmentVariable("ANTHROPIC_API_KEY"));
+builder.Services.AddSingleton<IBillAssistant, ClaudeBillAssistant>();
 
 builder.Services.AddHealthChecks().AddDbContextCheck<TariffDbContext>();
 builder.Services.AddProblemDetails();

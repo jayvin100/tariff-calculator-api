@@ -24,3 +24,12 @@ Content-Type: application/json
 }
 
 ###
+
+POST {{TariffCalculator.Api_HostAddress}}/api/bills/explain
+Content-Type: application/json
+
+{
+  "kWh": 650
+}
+
+###

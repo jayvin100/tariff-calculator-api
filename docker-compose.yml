@@ -24,6 +24,7 @@ services:
       ASPNETCORE_ENVIRONMENT: Development
       ConnectionStrings__Default: Server=db,1433;Database=TariffCalculator;User Id=sa;Password=${MSSQL_SA_PASSWORD:-Tariff_Dev_Passw0rd!};TrustServerCertificate=True
       Database__MigrateOnStartup: "true"
+      Anthropic__ApiKey: ${ANTHROPIC_API_KEY:-}   # optional, AI endpoints return 503 without it
     depends_on:
       db:
         condition: service_healthy

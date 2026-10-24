@@ -1,12 +1,14 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>2b017609-e41f-46c7-b0bf-ec667c008bf7</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Anthropic" Version="13.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.12" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.13">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

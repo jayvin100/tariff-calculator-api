@@ -1,5 +1,9 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using TariffCalculator.Api.Ai;
 using Testcontainers.MsSql;
 
 namespace TariffCalculator.Api.Tests;
@@ -8,6 +12,8 @@ namespace TariffCalculator.Api.Tests;
 public class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
     private readonly MsSqlContainer _sql = new MsSqlBuilder("mcr.microsoft.com/mssql/server:2022-latest").Build();
+
+    public FakeBillAssistant Assistant { get; } = new();
 
     public Task InitializeAsync() => _sql.StartAsync();
 
@@ -18,6 +24,10 @@ public class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
         builder.UseEnvironment("Testing");
         builder.UseSetting("ConnectionStrings:Default", _sql.GetConnectionString());
         builder.UseSetting("Database:MigrateOnStartup", "true");
+
+        // never call the real Claude API from tests
+        builder.ConfigureTestServices(services =>
+            services.Replace(ServiceDescriptor.Singleton<IBillAssistant>(Assistant)));
     }
 }
 
