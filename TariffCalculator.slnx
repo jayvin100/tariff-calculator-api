@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/TariffCalculator.Api/TariffCalculator.Api.csproj" />
+    <Project Path="src/TariffCalculator.Core/TariffCalculator.Core.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/TariffCalculator.Tests/TariffCalculator.Tests.csproj" />
+  </Folder>
+</Solution>
