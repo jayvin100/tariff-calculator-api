@@ -4,6 +4,7 @@
     <Project Path="src/TariffCalculator.Core/TariffCalculator.Core.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/TariffCalculator.Api.Tests/TariffCalculator.Api.Tests.csproj" />
     <Project Path="tests/TariffCalculator.Tests/TariffCalculator.Tests.csproj" />
   </Folder>
 </Solution>
