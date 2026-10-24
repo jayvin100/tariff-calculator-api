@@ -6,7 +6,12 @@ namespace TariffCalculator.Api.Ai;
 public interface IBillAssistant
 {
     Task<string> ExplainAsync(Tariff tariff, int kWh, BillBreakdown bill, CancellationToken ct = default);
+
+    Task<AskResult> AskAsync(string question, IReadOnlyList<Tariff> tariffs, CancellationToken ct = default);
 }
+
+// the answer plus every calculation Claude asked for, so the client can see where the numbers came from
+public record AskResult(string Answer, IReadOnlyList<BillCalculation> Calculations);
 
 // AI isn't configured, or the Claude API is down / rate limited
 public class AssistantUnavailableException(string message, Exception? inner = null) : Exception(message, inner);

@@ -11,6 +11,8 @@ public record ExplainRequest(int KWh, [property: StringLength(32)] string? Tarif
 
 public record ExplainResponse(string Tariff, int KWh, BillBreakdown Bill, string Explanation);
 
+public record AskRequest([property: Required, StringLength(500, MinimumLength = 3)] string Question);
+
 public static class BillEndpoints
 {
     public const string DefaultTariff = "DOMESTIC";
@@ -44,6 +46,22 @@ public static class BillEndpoints
             {
                 var explanation = await assistant.ExplainAsync(found!, request.KWh, bill, ct);
                 return TypedResults.Ok(new ExplainResponse(found!.Code, request.KWh, bill, explanation));
+            }
+            catch (Exception ex) when (ex is AssistantUnavailableException or AssistantRefusedException)
+            {
+                return AssistantProblem(ex);
+            }
+        });
+
+        // POST /api/bills/ask  { "question": "I used 650 kWh, how much is that and how do I avoid the RM10 charge?" }
+        // Claude answers in plain English, calling BillCalculator through tools for every number
+        group.MapPost("/ask", async Task<Results<Ok<AskResult>, ProblemHttpResult>> (
+            AskRequest request, TariffDbContext db, IBillAssistant assistant, CancellationToken ct) =>
+        {
+            var tariffs = await db.Tariffs.AsNoTracking().OrderBy(t => t.Code).ToListAsync(ct);
+            try
+            {
+                return TypedResults.Ok(await assistant.AskAsync(request.Question, tariffs, ct));
             }
             catch (Exception ex) when (ex is AssistantUnavailableException or AssistantRefusedException)
             {

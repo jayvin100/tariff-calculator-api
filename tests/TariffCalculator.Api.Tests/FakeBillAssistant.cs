@@ -1,3 +1,4 @@
+using System.Text.Json;
 using TariffCalculator.Api.Ai;
 using TariffCalculator.Core;
 
@@ -12,6 +13,18 @@ public class FakeBillAssistant : IBillAssistant
     {
         ThrowIfRequested();
         return Task.FromResult($"Fake explanation for {kWh} kWh on {tariff.Code}: total RM{bill.Total}.");
+    }
+
+    // pretends Claude called calculate_bill once, through the real BillTools
+    public Task<AskResult> AskAsync(string question, IReadOnlyList<Tariff> tariffs, CancellationToken ct = default)
+    {
+        ThrowIfRequested();
+        var tools = new BillTools(tariffs, new BillCalculator());
+        tools.Execute(BillTools.CalculateBill, new Dictionary<string, JsonElement>
+        {
+            ["kwh"] = JsonSerializer.SerializeToElement(601),
+        });
+        return Task.FromResult(new AskResult($"Fake answer to: {question}", tools.Calculations));
     }
 
     private void ThrowIfRequested()

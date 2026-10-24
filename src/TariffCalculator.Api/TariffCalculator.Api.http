@@ -33,3 +33,12 @@ Content-Type: application/json
 }
 
 ###
+
+POST {{TariffCalculator.Api_HostAddress}}/api/bills/ask
+Content-Type: application/json
+
+{
+  "question": "I used 650 kWh last month. What is my bill, and how much would I save if I got under the RM10 retail charge?"
+}
+
+###
