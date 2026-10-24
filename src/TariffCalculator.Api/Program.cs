@@ -36,7 +36,7 @@ if (app.Environment.IsDevelopment())
     app.MapScalarApiReference();   // interactive API docs at /scalar
 }
 
-app.UseHttpsRedirection();
+// no UseHttpsRedirection: in Docker the API only listens on HTTP, TLS belongs to whatever proxy sits in front
 
 app.MapHealthChecks("/health");
 app.MapTariffEndpoints();
