@@ -4,3 +4,23 @@ GET {{TariffCalculator.Api_HostAddress}}/api/bills/calculate?kWh=601
 Accept: application/json
 
 ###
+
+GET {{TariffCalculator.Api_HostAddress}}/api/tariffs
+Accept: application/json
+
+###
+
+PUT {{TariffCalculator.Api_HostAddress}}/api/tariffs/DOMESTIC
+Content-Type: application/json
+
+{
+  "name": "Domestic",
+  "energyRate": 0.2703,
+  "capacityRate": 0.0455,
+  "networkRate": 0.1285,
+  "retailCharge": 10.00,
+  "retailWaiverLimitKwh": 600,
+  "maxSupportedKwh": 1500
+}
+
+###

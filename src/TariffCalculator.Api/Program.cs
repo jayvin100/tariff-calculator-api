@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+using Scalar.AspNetCore;
 using TariffCalculator.Api.Data;
+using TariffCalculator.Api.Endpoints;
 using TariffCalculator.Core;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,7 +13,10 @@ builder.Services.AddSingleton<BillCalculator>();
 builder.Services.AddDbContext<TariffDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
 
-// Add services to the container.
+builder.Services.AddHealthChecks().AddDbContextCheck<TariffDbContext>();
+builder.Services.AddProblemDetails();
+builder.Services.AddValidation();
+
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
@@ -28,26 +33,16 @@ if (app.Configuration.GetValue<bool>("Database:MigrateOnStartup"))
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.MapScalarApiReference();   // interactive API docs at /scalar
 }
 
 app.UseHttpsRedirection();
 
-// GET /api/bills/calculate?kWh=601&tariff=DOMESTIC
-app.MapGet("/api/bills/calculate", async (int kWh, string? tariff, TariffDbContext db, BillCalculator calculator) =>
-{
-    var code = (tariff ?? "DOMESTIC").ToUpperInvariant();
-    var found = await db.Tariffs.AsNoTracking().SingleOrDefaultAsync(t => t.Code == code);
-    if (found is null)
-        return Results.NotFound(new { error = $"Tariff '{code}' not found." });
-
-    try
-    {
-        return Results.Ok(calculator.Calculate(found, kWh));     // 200 + JSON breakdown
-    }
-    catch (ArgumentOutOfRangeException ex)
-    {
-        return Results.BadRequest(new { error = ex.Message });   // 400 for bad input
-    }
-});
+app.MapHealthChecks("/health");
+app.MapTariffEndpoints();
+app.MapBillEndpoints();
 
 app.Run();
+
+// lets the integration tests reference Program through WebApplicationFactory<Program>
+public partial class Program;
